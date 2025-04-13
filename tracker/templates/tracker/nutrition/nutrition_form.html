@@ -1,0 +1,111 @@
+{% extends 'tracker/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit Food Entry{% else %}Add Food Entry{% endif %} - FitTrack
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-utensils me-2"></i>
+            {% if form.instance.pk %}Edit Food Entry{% else %}Add Food Entry{% endif %}
+        </h1>
+        <hr>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Food Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.meal_type|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            {{ form.food_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.calories|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.protein|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.carbs|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fat|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form.notes|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'nutrition_list' %}?date={{ form.date.value|date:'Y-m-d' }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Food Log
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>
+                            {% if form.instance.pk %}Save Changes{% else %}Add Food{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="fas fa-calculator me-2 text-info"></i>
+                        <strong>Calories:</strong> Enter the total calories for this food item
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-drumstick-bite me-2 text-info"></i>
+                        <strong>Protein:</strong> Enter the amount in grams
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-bread-slice me-2 text-info"></i>
+                        <strong>Carbs:</strong> Enter the amount in grams
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-cheese me-2 text-info"></i>
+                        <strong>Fat:</strong> Enter the amount in grams
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-lightbulb me-2 text-info"></i>
+                        <strong>Tip:</strong> Use a food tracking app or nutrition facts labels to get accurate information
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

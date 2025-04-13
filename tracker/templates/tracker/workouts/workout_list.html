@@ -1,0 +1,113 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Your Workouts - FitTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">
+            <i class="fas fa-dumbbell me-2"></i>Your Workouts
+        </h1>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'workout_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Log Workout
+        </a>
+    </div>
+</div>
+
+<!-- Filter options -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3"><i class="fas fa-filter me-2"></i>Filter Workouts</h5>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="date-range-start">Start Date</label>
+                            <input type="date" id="date-range-start" class="form-control" value="{{ request.GET.start_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="date-range-end">End Date</label>
+                            <input type="date" id="date-range-end" class="form-control" value="{{ request.GET.end_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button id="apply-date-range" class="btn btn-primary w-100">Apply Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if workouts %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Workout</th>
+                            <th>Duration</th>
+                            <th>Calories</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for workout in workouts %}
+                            <tr>
+                                <td>{{ workout.date }}</td>
+                                <td>
+                                    <a href="{% url 'workout_detail' workout.pk %}" class="fw-bold text-decoration-none">
+                                        {{ workout.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if workout.duration %}
+                                        {{ workout.duration }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if workout.calories_burned %}
+                                        {{ workout.calories_burned }} kcal
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'workout_detail' workout.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'workout_update' workout.pk %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'workout_delete' workout.pk %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <h5 class="mb-0">You haven't logged any workouts yet.</h5>
+                <p>Track your fitness journey by logging your workouts!</p>
+                <a href="{% url 'workout_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Log Your First Workout
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

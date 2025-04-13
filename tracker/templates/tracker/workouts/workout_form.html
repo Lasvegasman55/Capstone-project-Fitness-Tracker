@@ -1,0 +1,185 @@
+{% extends 'tracker/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if workout %}Edit Workout{% else %}Log Workout{% endif %} - FitTrack
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .exercise-form {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .exercise-header {
+        background-color: #e9ecef;
+        padding: 10px;
+        margin: -15px -15px 15px -15px;
+        border-radius: 8px 8px 0 0;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-dumbbell me-2"></i>
+            {% if workout %}Edit Workout{% else %}Log Workout{% endif %}
+        </h1>
+        <hr>
+    </div>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Workout Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ workout_form.title|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ workout_form.date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ workout_form.duration|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ workout_form.calories_burned|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ workout_form.notes|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Exercises</h5>
+                    <button type="button" id="add-exercise-btn" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-1"></i>Add Exercise
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ exercise_formset.management_form }}
+                    
+                    <div id="exercise-formset">
+                        {% for exercise_form in exercise_formset %}
+                            <div class="exercise-form">
+                                <div class="exercise-header">
+                                    Exercise #{{ forloop.counter }}
+                                </div>
+                                
+                                {{ exercise_form.id }}
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="{{ exercise_form.exercise.id_for_label }}">Exercise</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control exercise-search" placeholder="Search exercises...">
+                                                {{ exercise_form.exercise }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        {{ exercise_form.sets|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ exercise_form.reps|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ exercise_form.weight|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ exercise_form.distance|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ exercise_form.duration|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {{ exercise_form.notes|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Quick Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            <strong>Duration format:</strong> Use HH:MM:SS format (e.g. 00:45:00 for 45 minutes)
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            <strong>Weight:</strong> Enter weight in kilograms
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            <strong>Distance:</strong> Enter distance in kilometers
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            <strong>Search:</strong> Use the search box above each exercise dropdown to quickly find exercises
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Submit</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>
+                            {% if workout %}Save Changes{% else %}Log Workout{% endif %}
+                        </button>
+                        <a href="{% if workout %}{% url 'workout_detail' workout.pk %}{% else %}{% url 'workout_list' %}{% endif %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

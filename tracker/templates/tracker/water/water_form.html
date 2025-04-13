@@ -1,0 +1,95 @@
+{% extends 'tracker/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Log Water Intake - FitTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tint me-2"></i>Log Water Intake
+        </h1>
+        <hr>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Water Intake Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.time|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            {{ form.amount|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Quick Select</label>
+                            <div class="btn-group w-100">
+                                <button type="button" class="btn btn-outline-info quick-select" data-amount="250">250 ml</button>
+                                <button type="button" class="btn btn-outline-info quick-select" data-amount="500">500 ml</button>
+                                <button type="button" class="btn btn-outline-info quick-select" data-amount="750">750 ml</button>
+                                <button type="button" class="btn btn-outline-info quick-select" data-amount="1000">1000 ml</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'water_list' %}?date={{ form.date.value|date:'Y-m-d' }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
+                        <button type="submit" class="btn btn-info text-white">
+                            <i class="fas fa-save me-2"></i>Log Water
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle quick select buttons
+        const quickSelectButtons = document.querySelectorAll('.quick-select');
+        const amountInput = document.getElementById('id_amount');
+        
+        quickSelectButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const amount = this.dataset.amount;
+                amountInput.value = amount;
+                
+                // Remove active class from all buttons
+                quickSelectButtons.forEach(btn => {
+                    btn.classList.remove('btn-info');
+                    btn.classList.remove('text-white');
+                    btn.classList.add('btn-outline-info');
+                });
+                
+                // Add active class to clicked button
+                this.classList.remove('btn-outline-info');
+                this.classList.add('btn-info');
+                this.classList.add('text-white');
+            });
+        });
+    });
+</script>
+{% endblock %}

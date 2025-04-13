@@ -1,0 +1,21 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Logged Out - FitTrack{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Logged Out</h4>
+            </div>
+            <div class="card-body text-center">
+                <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                <h5>You have been successfully logged out.</h5>
+                <p>Thank you for using FitTrack!</p>
+                <a href="{% url 'login' %}" class="btn btn-primary mt-3">Log In Again</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

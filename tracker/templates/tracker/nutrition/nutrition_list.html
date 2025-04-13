@@ -1,0 +1,189 @@
+{% extends 'tracker/base.html' %}
+{% load tracker_extras %}
+
+{% block title %}Nutrition Tracking - FitTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">
+            <i class="fas fa-utensils me-2"></i>Nutrition Tracking
+        </h1>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'nutrition_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Food Entry
+        </a>
+    </div>
+</div>
+
+<!-- Date Navigation -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-start">
+                <a href="?date={{ selected_date|date:'Y-m-d'|date:'Y-m-d'|add_days:'-1' }}" class="btn btn-outline-primary">
+                    <i class="fas fa-chevron-left me-2"></i>Previous Day
+                </a>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="input-group">
+                    <input type="date" id="date-filter" class="form-control text-center" value="{{ selected_date|date:'Y-m-d' }}">
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="?date={{ selected_date|date:'Y-m-d'|date:'Y-m-d'|add_days:'1' }}" class="btn btn-outline-primary">
+                    Next Day<i class="fas fa-chevron-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Daily Summary Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Daily Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h2 class="display-5 fw-bold">
+                        {{ totals.total_calories|default:"0" }}
+                    </h2>
+                    <p class="lead">Calories</p>
+                </div>
+                
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="bg-primary text-white rounded p-2 mb-2">
+                            {{ totals.total_protein|default:"0" }}g
+                        </div>
+                        <small>Protein</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-warning text-dark rounded p-2 mb-2">
+                            {{ totals.total_carbs|default:"0" }}g
+                        </div>
+                        <small>Carbs</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-danger text-white rounded p-2 mb-2">
+                            {{ totals.total_fat|default:"0" }}g
+                        </div>
+                        <small>Fat</small>
+                    </div>
+                </div>
+                
+                <!-- Macronutrient ratio chart could go here -->
+                
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'nutrition_create' %}?date={{ selected_date|date:'Y-m-d' }}" class="btn btn-outline-success">
+                        <i class="fas fa-plus me-2"></i>Add Food
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Food Entries by Meal -->
+    <div class="col-md-8">
+        {% if entries %}
+            {% for meal_name, meal_entries in meals.items %}
+                {% if meal_entries %}
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header 
+                            {% if meal_name == 'Breakfast' %}bg-warning text-dark
+                            {% elif meal_name == 'Lunch' %}bg-info text-white
+                            {% elif meal_name == 'Dinner' %}bg-primary text-white
+                            {% else %}bg-secondary text-white{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    {% if meal_name == 'Breakfast' %}<i class="fas fa-sun me-2"></i>
+                                    {% elif meal_name == 'Lunch' %}<i class="fas fa-cloud-sun me-2"></i>
+                                    {% elif meal_name == 'Dinner' %}<i class="fas fa-moon me-2"></i>
+                                    {% else %}<i class="fas fa-cookie-bite me-2"></i>{% endif %}
+                                    {{ meal_name }}
+                                </h5>
+                                <a href="{% url 'nutrition_create' %}?date={{ selected_date|date:'Y-m-d' }}&meal_type={{ meal_name|lower }}" class="btn btn-sm 
+                                    {% if meal_name == 'Breakfast' %}btn-outline-dark
+                                    {% elif meal_name == 'Lunch' %}btn-outline-light
+                                    {% elif meal_name == 'Dinner' %}btn-outline-light
+                                    {% else %}btn-outline-light{% endif %}">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Food</th>
+                                            <th>Calories</th>
+                                            <th>Protein</th>
+                                            <th>Carbs</th>
+                                            <th>Fat</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for entry in meal_entries %}
+                                            <tr>
+                                                <td>{{ entry.food_name }}</td>
+                                                <td>{{ entry.calories }} kcal</td>
+                                                <td>
+                                                    {% if entry.protein %}
+                                                        {{ entry.protein }}g
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if entry.carbs %}
+                                                        {{ entry.carbs }}g
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if entry.fat %}
+                                                        {{ entry.fat }}g
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a href="{% url 'nutrition_update' entry.pk %}" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'nutrition_delete' entry.pk %}" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <h5 class="mb-0">No food entries for {{ selected_date }}.</h5>
+                <p>Keep track of your nutrition by adding what you eat throughout the day.</p>
+                <a href="{% url 'nutrition_create' %}?date={{ selected_date|date:'Y-m-d' }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Food Entry
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

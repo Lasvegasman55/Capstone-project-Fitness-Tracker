@@ -1,0 +1,201 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Dashboard - FitTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </h1>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Daily Stats -->
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Today's Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span><i class="fas fa-fire me-2"></i>Calories</span>
+                    <span class="fw-bold">{{ calories_today }} kcal</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span><i class="fas fa-tint me-2"></i>Water</span>
+                    <span class="fw-bold">{{ water_today }} ml</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span><i class="fas fa-dumbbell me-2"></i>This week's workouts</span>
+                    <span class="fw-bold">{{ workouts_this_week }}</span>
+                </div>
+                
+                <div class="mt-3 text-center">
+                    <a href="{% url 'nutrition_create' %}" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="fas fa-plus me-1"></i>Log Food
+                    </a>
+                    <a href="{% url 'water_add' %}" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="fas fa-plus me-1"></i>Log Water
+                    </a>
+                    <a href="{% url 'workout_create' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-plus me-1"></i>Log Workout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        {% if latest_measurement %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Latest Measurements</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Recorded on {{ latest_measurement.date }}</p>
+                
+                {% if latest_measurement.weight %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span><i class="fas fa-weight me-2"></i>Weight</span>
+                    <span class="fw-bold">{{ latest_measurement.weight }} kg</span>
+                </div>
+                {% endif %}
+                
+                {% if latest_measurement.body_fat_percentage %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span><i class="fas fa-percentage me-2"></i>Body Fat</span>
+                    <span class="fw-bold">{{ latest_measurement.body_fat_percentage }}%</span>
+                </div>
+                {% endif %}
+                
+                <div class="mt-3 text-center">
+                    <a href="{% url 'measurement_create' %}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-plus me-1"></i>New Measurement
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Body Measurements</h5>
+            </div>
+            <div class="card-body text-center">
+                <p>No measurements recorded yet.</p>
+                <a href="{% url 'measurement_create' %}" class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-plus me-1"></i>Record Measurements
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Recent Workouts -->
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Recent Workouts</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_workouts %}
+                    <ul class="list-group list-group-flush">
+                        {% for workout in recent_workouts %}
+                            <li class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ workout.title }}</h6>
+                                        <small class="text-muted">{{ workout.date }}</small>
+                                    </div>
+                                    <a href="{% url 'workout_detail' workout.pk %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'workout_list' %}" class="btn btn-sm btn-outline-success">
+                            View All Workouts
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-center">No workouts recorded yet.</p>
+                    <div class="text-center">
+                        <a href="{% url 'workout_create' %}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-plus me-1"></i>Log Your First Workout
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Goals -->
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Active Goals</h5>
+            </div>
+            <div class="card-body">
+                {% if active_goals %}
+                    <ul class="list-group list-group-flush">
+                        {% for goal in active_goals %}
+                            <li class="list-group-item px-0">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">{{ goal.title }}</h6>
+                                        <small class="text-muted">Target: {{ goal.target_date }}</small>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'goal_complete' goal.pk %}" class="btn btn-sm btn-outline-success me-1">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        <a href="{% url 'goal_update' goal.pk %}" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'goal_list' %}" class="btn btn-sm btn-outline-warning">
+                            View All Goals
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-center">No active goals.</p>
+                    <div class="text-center">
+                        <a href="{% url 'goal_create' %}" class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-plus me-1"></i>Set a New Goal
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'workout_create' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-dumbbell me-2"></i>Log Workout
+                    </a>
+                    <a href="{% url 'measurement_create' %}" class="btn btn-outline-info">
+                        <i class="fas fa-weight me-2"></i>Record Measurements
+                    </a>
+                    <a href="{% url 'goal_create' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-bullseye me-2"></i>Set New Goal
+                    </a>
+                    <a href="{% url 'analytics' %}" class="btn btn-outline-success">
+                        <i class="fas fa-chart-line me-2"></i>View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

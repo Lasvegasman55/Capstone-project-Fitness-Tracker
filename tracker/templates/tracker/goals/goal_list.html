@@ -1,0 +1,150 @@
+{% extends 'tracker/base.html' %}
+{% load tracker_extras %}
+
+{% block title %}Your Goals - FitTrack{% endblock %}
+
+{% block content %}
+<!-- All your content here -->
+{% endblock %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">
+            <i class="fas fa-bullseye me-2"></i>Your Goals
+        </h1>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'goal_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>New Goal
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs mb-4" id="goalTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button">
+                    Active Goals <span class="badge bg-primary ms-1">{{ active_goals|length }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button">
+                    Completed Goals <span class="badge bg-success ms-1">{{ completed_goals|length }}</span>
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="goalTabsContent">
+            <!-- Active Goals Tab -->
+            <div class="tab-pane fade show active" id="active" role="tabpanel">
+                {% if active_goals %}
+                    <div class="row">
+                        {% for goal in active_goals %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card shadow-sm goal-item">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="card-title">{{ goal.title }}</h5>
+                                            <span class="badge 
+                                                {% if goal.goal_type == 'weight' %}bg-info
+                                                {% elif goal.goal_type == 'strength' %}bg-danger
+                                                {% elif goal.goal_type == 'endurance' %}bg-success
+                                                {% else %}bg-warning{% endif %}">
+                                                {{ goal.get_goal_type_display }}
+                                            </span>
+                                        </div>
+                                        <p class="card-text">{{ goal.description }}</p>
+                                        
+                                        {% if goal.target_value %}
+                                            <p class="mb-2">
+                                                <i class="fas fa-bullseye me-2"></i>Target: {{ goal.target_value }}
+                                                {% if goal.goal_type == 'weight' %}kg{% endif %}
+                                            </p>
+                                        {% endif %}
+                                        
+                                        <p class="mb-2">
+                                            <i class="fas fa-calendar-alt me-2"></i>Target Date: {{ goal.target_date }}
+                                        </p>
+                                        
+                                        {% with days_left=goal.target_date|timeuntil %}
+                                        <p class="mb-3 {% if 'day' in days_left %}text-warning{% else %}text-muted{% endif %}">
+                                            <i class="fas fa-hourglass-half me-2"></i>{{ days_left }} left
+                                        </p>
+                                    {% endwith %}
+                                        
+                                        <div class="btn-group w-100">
+                                            <a href="{% url 'goal_complete' goal.pk %}" class="btn btn-success">
+                                                <i class="fas fa-check me-1"></i>Complete
+                                            </a>
+                                            <a href="{% url 'goal_update' goal.pk %}" class="btn btn-primary">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </a>
+                                            <a href="{% url 'goal_delete' goal.pk %}" class="btn btn-danger">
+                                                <i class="fas fa-trash me-1"></i>Delete
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <h5 class="mb-0">You don't have any active goals.</h5>
+                        <p>Setting goals is a great way to stay motivated and track your progress!</p>
+                        <a href="{% url 'goal_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Your First Goal
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Completed Goals Tab -->
+            <div class="tab-pane fade" id="completed" role="tabpanel">
+                {% if completed_goals %}
+                    <div class="row">
+                        {% for goal in completed_goals %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card shadow-sm goal-item completed">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="card-title">{{ goal.title }}</h5>
+                                            <span class="badge 
+                                                {% if goal.goal_type == 'weight' %}bg-info
+                                                {% elif goal.goal_type == 'strength' %}bg-danger
+                                                {% elif goal.goal_type == 'endurance' %}bg-success
+                                                {% else %}bg-warning{% endif %}">
+                                                {{ goal.get_goal_type_display }}
+                                            </span>
+                                        </div>
+                                        <p class="card-text">{{ goal.description }}</p>
+                                        
+                                        {% if goal.target_value %}
+                                            <p class="mb-2">
+                                                <i class="fas fa-bullseye me-2"></i>Target: {{ goal.target_value }}
+                                                {% if goal.goal_type == 'weight' %}kg{% endif %}
+                                            </p>
+                                        {% endif %}
+                                        
+                                        <p class="mb-2">
+                                            <i class="fas fa-calendar-check me-2"></i>Completed: {{ goal.completed_at|date:"F j, Y" }}
+                                        </p>
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-trophy me-2"></i>Congratulations on achieving this goal!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <h5 class="mb-0">You haven't completed any goals yet.</h5>
+                        <p>Keep working on your active goals. You'll get there!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
