@@ -1,15 +1,23 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    # Authentication
+    # Other URL patterns...
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns = [
+   # Authentication
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='tracker/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='tracker/logout.html'), name='logout'),
     
-    # Dashboard
-    path('', views.dashboard, name='dashboard'),
+    # Dashboard - now as 'dashboard/' instead of the root
+    path('dashboard/', views.dashboard, name='dashboard'),
+    
+  
     
     # Profile
     path('profile/', views.profile, name='profile'),
@@ -47,4 +55,6 @@ urlpatterns = [
     
     # Analytics
     path('analytics/', views.analytics, name='analytics'),
+
+    
 ]

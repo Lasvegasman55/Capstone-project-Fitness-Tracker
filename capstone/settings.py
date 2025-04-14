@@ -28,7 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'  # Redirect to dashboard after login
+LOGIN_REDIRECT_URL = '/tracker/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'  # Redirect to login page after logout
 
 # Application definition

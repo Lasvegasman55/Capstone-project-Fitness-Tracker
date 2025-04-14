@@ -1,0 +1,112 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Welcome to FitTrack - Your Personal Fitness Journey{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold text-primary mb-3">Welcome to FitTrack</h1>
+            <p class="lead">Your personal companion for fitness tracking, goal setting, and health monitoring.</p>
+            <p class="mb-4">Take control of your fitness journey with our comprehensive tracking tools designed to help you achieve your health goals.</p>
+            <div class="d-grid gap-2 d-md-flex">
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4">Get Started</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">Log In</a>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center mt-4 mt-lg-0">
+            <!-- Replace with your own image -->
+            <img src="/media/welcome/profile.jpg" alt="Profile Image" width="300" height="300">
+        </div>
+    </div>
+    
+    <!-- About Developer Section -->
+    <div class="row mt-5 pt-5 border-top">
+        <div class="col-12">
+            <h2 class="text-center mb-4">About the Developer</h2>
+        </div>
+        <div class="col-md-4 mb-4 mb-md-0">
+            <!-- Replace with your own image if desired -->
+            <img src="/media/welcome/developer.jpg" alt="Developer Image" width="300" height="300">
+        </div>
+        <div class="col-md-8">
+            <h3>Hi, I'm Michael Matthews</h3>
+            <p class="lead">Full Stack Developer & Fitness Enthusiast</p>
+            <p>I created FitTrack as my capstone project for my full stack development class. As someone passionate about both technology and fitness, I wanted to build a tool that helps people track their fitness progress in a comprehensive way.</p>
+            <p>This project showcases my skills in Django, Python, JavaScript, and front-end development. I've integrated features that allow users to track workouts, set goals, monitor nutrition, and visualize progress over time.</p>
+            <p>When I'm not coding, you can find me at the gym, hiking local trails, or experimenting with new healthy recipes in the kitchen.</p>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5 pt-5 border-top text-center">
+        <div class="col-12">
+            <h2 class="mb-5">Features</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-dumbbell text-primary fa-3x mb-3"></i>
+                    <h4>Workout Tracking</h4>
+                    <p>Log and track your exercises, sets, reps, and weights. Monitor your progress and see your strength improve over time.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-bullseye text-primary fa-3x mb-3"></i>
+                    <h4>Goal Setting</h4>
+                    <p>Set fitness goals for weight, strength, endurance, and habits. Track your progress and celebrate achievements.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-weight text-primary fa-3x mb-3"></i>
+                    <h4>Body Measurements</h4>
+                    <p>Track your weight, body fat percentage, and other body measurements to see your physical transformation.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-utensils text-primary fa-3x mb-3"></i>
+                    <h4>Nutrition Tracking</h4>
+                    <p>Log your meals and track your calorie and macronutrient intake to support your fitness goals with proper nutrition.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-tint text-primary fa-3x mb-3"></i>
+                    <h4>Water Intake</h4>
+                    <p>Track your daily water consumption to ensure proper hydration, essential for optimal performance and recovery.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-chart-line text-primary fa-3x mb-3"></i>
+                    <h4>Analytics Dashboard</h4>
+                    <p>Visualize your progress with detailed charts and analytics to understand your fitness journey and make informed decisions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="row mt-5 pt-5 border-top text-center">
+        <div class="col-12">
+            <h2 class="mb-4">Ready to Start Your Fitness Journey?</h2>
+            <p class="lead mb-4">Join FitTrack today and take the first step toward achieving your fitness goals.</p>
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 py-3">Create Your Account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

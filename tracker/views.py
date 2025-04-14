@@ -6,6 +6,7 @@ from django.utils import timezone
 from datetime import timedelta, date
 from django.contrib.auth import login
 
+
 from .models import (
     Profile, Goal, Exercise, ExerciseCategory, 
     Workout, WorkoutExercise, BodyMeasurement,
@@ -16,6 +17,10 @@ from .forms import (
     WorkoutForm, WorkoutExerciseFormSet, BodyMeasurementForm,
     NutritionEntryForm, WaterIntakeForm
 )
+
+def welcome(request):
+    """Display the welcome/landing page"""
+    return render(request, 'tracker/welcome/index.html')
 
 def register(request):
     if request.method == 'POST':
