@@ -1,11 +1,19 @@
 {% extends 'tracker/base.html' %}
+{% load static %}
 
 {% block title %}Welcome to FitTrack - Your Personal Fitness Journey{% endblock %}
+
+{% block extra_head %}
+<!-- Include the responsive CSS file -->
+<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+<!-- Ensure proper viewport settings -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <!-- Hero Section -->
-    <div class="row align-items-center mb-5">
+    <div class="row align-items-center mb-5 hero-section">
         <div class="col-lg-6">
             <h1 class="display-4 fw-bold text-primary mb-3">Welcome to FitTrack</h1>
             <p class="lead">Your personal companion for fitness tracking, goal setting, and health monitoring.</p>
@@ -16,8 +24,8 @@
             </div>
         </div>
         <div class="col-lg-6 text-center mt-4 mt-lg-0">
-            <!-- Replace with your own image -->
-            <img src="/media/welcome/profile.jpg" alt="Profile Image" width="300" height="300">
+            <!-- Responsive image handling -->
+            <img src="/media/welcome/profile.jpg" alt="Profile Image" class="img-fluid rounded shadow" style="max-width: 300px;">
         </div>
     </div>
     
@@ -26,9 +34,16 @@
         <div class="col-12">
             <h2 class="text-center mb-4">About the Developer</h2>
         </div>
-        <div class="col-md-4 mb-4 mb-md-0">
-            <!-- Replace with your own image if desired -->
-            <img src="/media/welcome/developer.jpg" alt="Developer Image" width="300" height="300">
+        <div class="col-md-4 mb-4 mb-md-0 text-center">
+            <!-- Responsive image handling -->
+            <img src="/media/welcome/developer.jpg" alt="Developer Image" class="img-fluid rounded shadow" style="max-width: 250px;">
+            
+            <!-- Contact Me Button -->
+            <div class="mt-3">
+                <a href="mailto:michael.matthews@example.com" class="btn btn-primary">
+                    <i class="fas fa-envelope me-2"></i>Contact Me
+                </a>
+            </div>
         </div>
         <div class="col-md-8">
             <h3>Hi, I'm Michael Matthews</h3>
@@ -36,6 +51,13 @@
             <p>I created FitTrack as my capstone project for my full stack development class. As someone passionate about both technology and fitness, I wanted to build a tool that helps people track their fitness progress in a comprehensive way.</p>
             <p>This project showcases my skills in Django, Python, JavaScript, and front-end development. I've integrated features that allow users to track workouts, set goals, monitor nutrition, and visualize progress over time.</p>
             <p>When I'm not coding, you can find me at the gym, hiking local trails, or experimenting with new healthy recipes in the kitchen.</p>
+            
+            <!-- Alternative Contact Button for Mobile - Visible only on larger screens -->
+            <div class="d-none d-md-block mt-3">
+                <a href="ftwalton31@yahoo.com" class="btn btn-outline-primary">
+                    <i class="fas fa-envelope me-2"></i>Send me an email
+                </a>
+            </div>
         </div>
     </div>
 
@@ -44,7 +66,7 @@
         <div class="col-12">
             <h2 class="mb-5">Features</h2>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-sm-6 col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-dumbbell text-primary fa-3x mb-3"></i>
@@ -53,7 +75,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-sm-6 col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-bullseye text-primary fa-3x mb-3"></i>
@@ -62,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-sm-6 col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-weight text-primary fa-3x mb-3"></i>
@@ -71,7 +93,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-sm-6 col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-utensils text-primary fa-3x mb-3"></i>
@@ -80,7 +102,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-sm-6 col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-tint text-primary fa-3x mb-3"></i>
@@ -89,7 +111,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-sm-6 col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <i class="fas fa-chart-line text-primary fa-3x mb-3"></i>
@@ -109,4 +131,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %}v

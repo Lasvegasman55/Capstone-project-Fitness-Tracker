@@ -1,0 +1,234 @@
+/* Responsive Design for FitTrack */
+
+/* Base Styles - these build upon your existing CSS */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px; /* Consistent padding */
+}
+
+/* Typography Responsive Adjustments */
+h1.display-4 {
+    font-size: calc(1.5rem + 2vw); /* Responsive font size */
+}
+
+.lead {
+    font-size: calc(1rem + 0.3vw);
+}
+
+/* Images Responsive Handling */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Card Styles Enhancement */
+.card {
+    height: 100%;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Mobile Navigation */
+@media (max-width: 991.98px) {
+    .navbar-nav {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    .navbar-toggler {
+        padding: 0.5rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+}
+
+/* Responsive Button Adjustments */
+@media (max-width: 767.98px) {
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .d-grid.gap-2.d-md-flex {
+        display: grid !important;
+    }
+}
+
+/* Custom Media Queries for Welcome Page */
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+    .stat-card {
+        margin-bottom: 0;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .col-md-4 {
+        padding: 0 10px;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .fa-3x {
+        font-size: 2.5em;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .hero-section {
+        min-height: 500px;
+    }
+}
+
+/* Extra Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+/* Features Section Responsive Grid */
+@media (max-width: 767.98px) {
+    .col-md-4 {
+        margin-bottom: 20px;
+    }
+}
+
+/* About Developer Section Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .col-md-4 img {
+        margin-bottom: 20px;
+        max-width: 200px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Responsive Dashboard Components */
+@media (max-width: 767.98px) {
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .exercise-row, .goal-item {
+        padding: 8px;
+    }
+}
+
+/* Form Elements Responsive Adjustments */
+@media (max-width: 576px) {
+    input[type="date"],
+    select.form-select,
+    input.form-control {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Hero Section Responsive Fixes */
+@media (max-width: 991.98px) {
+    .row.align-items-center.mb-5 {
+        text-align: center;
+    }
+    
+    .d-grid.gap-2.d-md-flex {
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+}
+
+/* Utility Classes for Responsive Spacing */
+@media (max-width: 767.98px) {
+    .mb-md-0 {
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .mt-md-0 {
+        margin-top: 1.5rem !important;
+    }
+    
+    .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    
+    .mt-5 {
+        margin-top: 2.5rem !important;
+    }
+    
+    .pt-5 {
+        padding-top: 2.5rem !important;
+    }
+}
+
+/* Call-to-Action Section Responsive */
+@media (max-width: 576px) {
+    .btn-lg.px-5.py-3 {
+        padding: 0.5rem 1.5rem !important;
+    }
+}
+
+/* Responsive Footer */
+footer {
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+@media (max-width: 767.98px) {
+    footer {
+        text-align: center;
+    }
+    
+    footer .col-md-6:first-child {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Fix for Font Awesome Icons on Mobile */
+@media (max-width: 576px) {
+    .fa-3x {
+        font-size: 2em;
+    }
+}
+
+/* Dark Mode Responsiveness */
+@media (prefers-color-scheme: dark) {
+    .dark-mode-auto {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    .dark-mode-auto .card {
+        background-color: #454d55;
+        color: #f8f9fa;
+    }
+}

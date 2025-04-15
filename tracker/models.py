@@ -43,6 +43,12 @@ class ExerciseCategory(models.Model):
     class Meta:
         verbose_name_plural = "Exercise Categories"
 
+class MuscleGroup(models.Model):
+    name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.name
+
 class Exercise(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
