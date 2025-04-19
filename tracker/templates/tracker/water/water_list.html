@@ -1,10 +1,115 @@
-{% extends 'tracker/base.html' %}
-
-{% block title %}Water Tracking - FitTrack{% endblock %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <!-- All your content here -->
+<div class="container">
+  <div class="row mb-4">
+    <div class="col">
+      <h1>Water Tracking</h1>
+      <div class="d-flex justify-content-between align-items-center">
+        <p class="lead">Stay hydrated!</p>
+        <a href="{% url 'water_add' %}" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Add Water
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <form method="get" class="form-inline">
+            <div class="form-group">
+              <label for="date" class="mr-2">Select Date:</label>
+              <input type="date" name="date" id="date" class="form-control" value="{{ selected_date|date:'Y-m-d' }}">
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">View</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>Daily Summary - {{ selected_date }}</h3>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="mr-3">
+              <i class="bi bi-droplet-fill text-primary" style="font-size: 3rem;"></i>
+            </div>
+            <div>
+              <h2 class="mb-0">{{ total_intake }} ml</h2>
+              <p class="text-muted">out of recommended 2000-3000 ml</p>
+            </div>
+          </div>
+          
+          <div class="progress" style="height: 25px;">
+            <div id="water-progress-bar" 
+                 class="progress-bar bg-primary" 
+                 role="progressbar" 
+                 aria-valuenow="{{ percentage }}" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+              {{ percentage }}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     
-    <!-- Add this at the very end of the file -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>Water Intake Entries</h3>
+        </div>
+        <div class="card-body">
+          {% if intakes %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Amount (ml)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for intake in intakes %}
+                  <tr>
+                    <td>{{ intake.time }}</td>
+                    <td>{{ intake.amount }}</td>
+                    <td>
+                      <a href="{% url 'water_delete' intake.id %}" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted">No water intake recorded for this date.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %}
+<!-- Using JavaScript to set the width instead of CSS -->
+{% endcomment %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const progressBar = document.getElementById('water-progress-bar');
+    if (progressBar) {
+      progressBar.style.width = '{{ percentage }}%';
+    }
+  });
+</script>
 {% endblock %}

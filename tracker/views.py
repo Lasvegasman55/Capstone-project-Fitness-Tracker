@@ -163,7 +163,7 @@ def workout_list(request):
 
 @login_required
 def workout_detail(request, pk):
-    workout = get_object_or_404(Workout, pk=pk, user=request.user)
+    workout = get_object_or_404(Workout, id=pk)
     exercises = workout.exercises.all().order_by('order')
     
     context = {
@@ -400,12 +400,22 @@ def water_list(request):
         date=selected_date
     ).order_by('time')
     
+    # Add debug print to help troubleshoot
+    print(f"Water intakes for {selected_date}: {intakes.count()}")
+    
     total_intake = intakes.aggregate(Sum('amount'))['amount__sum'] or 0
+    print(f"Total water intake: {total_intake}ml")
+    
+    # Calculate percentage of daily goal (3000ml)
+    daily_goal = 3000
+    percentage = min(100, round((total_intake / daily_goal) * 100)) if total_intake else 0
     
     context = {
         'intakes': intakes,
         'total_intake': total_intake,
         'selected_date': selected_date,
+        'percentage': percentage,
+        'daily_goal': daily_goal
     }
     
     return render(request, 'tracker/water/water_list.html', context)
@@ -418,6 +428,8 @@ def water_add(request):
             water = form.save(commit=False)
             water.user = request.user
             water.save()
+            # Add debug print
+            print(f"Added water: {water.amount}ml on {water.date}")
             messages.success(request, f'Added {water.amount}ml of water!')
             return redirect('water_list')
     else:
@@ -439,6 +451,7 @@ def water_delete(request, pk):
         return redirect('water_list')
     
     return render(request, 'tracker/water/water_confirm_delete.html', {'intake': intake})
+
 
 # Analytics and Reports
 @login_required

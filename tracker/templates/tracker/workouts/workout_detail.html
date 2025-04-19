@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="col">
+      <h1>Workout Details</h1>
+      <div class="d-flex justify-content-between align-items-center">
+        <a href="{% url 'workout_list' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Back to Workouts
+        </a>
+        <div>
+          <a href="{% url 'workout_update' workout.id %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Edit
+          </a>
+          <a href="{% url 'workout_delete' workout.id %}" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="card-title">{{ workout.title }}</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Date:</strong> {{ workout.date }}</p>
+          <p><strong>Duration:</strong> {{ workout.duration }} minutes</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Calories Burned:</strong> {% if workout.calories_burned %}{{ workout.calories_burned }}{% else %}Not recorded{% endif %}</p>
+          <p><strong>Workout Type:</strong> {{ workout.get_workout_type_display }}</p>
+        </div>
+      </div>
+      
+      {% if workout.notes %}
+      <div class="row mt-3">
+        <div class="col">
+          <h4>Notes</h4>
+          <p>{{ workout.notes }}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Exercises</h3>
+    </div>
+    <div class="card-body">
+      {% if exercises %}
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Exercise</th>
+                <th>Sets</th>
+                <th>Reps</th>
+                <th>Weight</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for exercise in exercises %}
+              <tr>
+                <td>{{ exercise.exercise.name }}</td>
+                <td>{{ exercise.sets }}</td>
+                <td>{{ exercise.reps }}</td>
+                <td>
+                  {% if exercise.weight %}
+                    {{ exercise.weight }} {{ exercise.get_weight_unit_display }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>{{ exercise.notes|default:"-" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted">No exercises recorded for this workout.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
