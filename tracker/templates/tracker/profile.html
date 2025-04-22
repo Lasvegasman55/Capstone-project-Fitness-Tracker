@@ -20,11 +20,21 @@
                 <h5 class="mb-0">Account Information</h5>
             </div>
             <div class="card-body text-center">
-                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid mb-3" style="max-width: 150px;">
+                {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid mb-3" style="max-width: 150px;">
+                {% else %}
+                    <img src="/media/default-profile.jpg" alt="Default Profile Picture" class="rounded-circle img-fluid mb-3" style="max-width: 150px;">
+                {% endif %}
                 <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+                <p style="color: red; font-weight: bold;">Full Stack Developer & Fitness Enthusiast</p>
                 <p class="text-muted">@{{ user.username }}</p>
                 <p>
-                    <i class="fas fa-envelope me-2"></i>{{ user.email }}
+                    <i class="fas fa-envelope me-2"></i>
+                    {% if user.email %}
+                        <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                    {% else %}
+                        No email provided
+                    {% endif %}
                 </p>
                 <p>
                     <i class="fas fa-calendar-alt me-2"></i>Member since: {{ user.date_joined|date:"F Y" }}
