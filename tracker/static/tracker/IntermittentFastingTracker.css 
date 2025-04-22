@@ -1,0 +1,199 @@
+/* IntermittentFastingTracker.css */
+.intermittent-fasting-tracker {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.intermittent-fasting-tracker h2 {
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.intermittent-fasting-tracker h3 {
+  color: #555;
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
+.protocol-selection {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.protocol-selection select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.custom-protocol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.custom-protocol div {
+  flex: 1;
+  min-width: 150px;
+}
+
+.custom-protocol label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.custom-protocol input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.fasting-status {
+  background-color: #f0f7ff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  margin: 15px 0;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #4CAF50;
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+}
+
+.fasting-notes {
+  margin: 20px 0;
+}
+
+.fasting-notes textarea {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.action-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.action-buttons button:first-child {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.action-buttons button:last-child {
+  background-color: #f44336;
+  color: white;
+}
+
+button {
+  background-color: #2196F3;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.fasting-history {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.fasting-logs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 4px;
+  border-left: 4px solid #ccc;
+}
+
+.log-entry.completed {
+  border-left-color: #4CAF50;
+}
+
+.log-entry.incomplete {
+  border-left-color: #f44336;
+}
+
+.log-notes {
+  grid-column: 1 / -1;
+  font-style: italic;
+  color: #666;
+  font-size: 0.9em;
+  padding-top: 5px;
+  border-top: 1px dashed #eee;
+}
+
+.view-more {
+  text-align: center;
+  color: #666;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .log-entry {
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 5px;
+  }
+  
+  .log-status {
+    grid-column: 1 / -1;
+  }
+}

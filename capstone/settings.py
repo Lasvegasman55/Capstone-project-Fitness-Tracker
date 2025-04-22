@@ -67,10 +67,7 @@ ROOT_URLCONF = 'capstone.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'tracker', 'templates'),
-        ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # This line is crucial
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,7 +77,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    }
+    },
 ]
 
 WSGI_APPLICATION = 'capstone.wsgi.application'

@@ -139,3 +139,68 @@ class WaterIntake(models.Model):
     
     def __str__(self):
         return f"{self.amount}ml on {self.date}"
+
+class FastingSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fasting_sessions')
+    
+    # Fasting details
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True, blank=True)
+    planned_duration = models.PositiveIntegerField(help_text="Planned fasting duration in hours")
+    
+    # Protocol choices
+    PROTOCOL_CHOICES = [
+        ('16_8', '16:8 (Leangains)'),
+        ('18_6', '18:6'),
+        ('20_4', '20:4 (Warrior Diet)'),
+        ('5_2', '5:2 (5 normal days, 2 fasting days)'),
+        ('custom', 'Custom'),
+    ]
+    protocol = models.CharField(max_length=10, choices=PROTOCOL_CHOICES, default='16_8')
+    custom_hours = models.PositiveIntegerField(null=True, blank=True, help_text="For custom protocol, hours to fast")
+    
+    # Status
+    is_active = models.BooleanField(default=True)
+    completed = models.BooleanField(default=False)
+    
+    # Notes/Journal
+    notes = models.TextField(blank=True, null=True)
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-start_time']
+    
+    def __str__(self):
+        return f"{self.user.username}'s fast - {self.get_protocol_display()} ({self.start_time.date()})"
+    
+    def duration_in_hours(self):
+        """Calculate actual duration of the fast in hours"""
+        if self.end_time:
+            delta = self.end_time - self.start_time
+            return round(delta.total_seconds() / 3600, 1)  # Convert to hours
+        return None
+    
+    def progress_percentage(self):
+        """Calculate the current progress percentage of the fast"""
+        if self.completed:
+            return 100
+            
+        if not self.is_active:
+            return 0
+            
+        current_time = timezone.now()
+        elapsed = current_time - self.start_time
+        elapsed_hours = elapsed.total_seconds() / 3600
+        
+        target_hours = self.custom_hours if self.protocol == 'custom' else {
+            '16_8': 16,
+            '18_6': 18,
+            '20_4': 20,
+            '5_2': 120,  # 5 days in hours
+        }.get(self.protocol, 16)
+        
+        percentage = min(100, (elapsed_hours / target_hours) * 100)
+        return round(percentage, 1)

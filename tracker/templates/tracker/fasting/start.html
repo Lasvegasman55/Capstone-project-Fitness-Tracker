@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Start Fasting{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Start a New Fasting Session</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="protocol" class="form-label">Select Fasting Protocol</label>
+                    <select name="protocol" id="protocol" class="form-select" onchange="toggleCustomHours()">
+                        {% for protocol_id, protocol_name in protocols %}
+                            <option value="{{ protocol_id }}">{{ protocol_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3" id="customHoursField" style="display: none;">
+                    <label for="custom_hours" class="form-label">Custom Fasting Hours</label>
+                    <input type="number" class="form-control" id="custom_hours" name="custom_hours" value="16" min="1" max="72">
+                    <div class="form-text">Enter the number of hours you plan to fast</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Start Fasting</button>
+                <a href="{% url 'fasting_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleCustomHours() {
+        const protocolSelect = document.getElementById('protocol');
+        const customHoursField = document.getElementById('customHoursField');
+        
+        if (protocolSelect.value === 'custom') {
+            customHoursField.style.display = 'block';
+        } else {
+            customHoursField.style.display = 'none';
+        }
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', toggleCustomHours);
+</script>
+{% endblock %}

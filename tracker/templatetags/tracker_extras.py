@@ -34,3 +34,8 @@ def add_days(value, days):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key, None)
+
+@register.inclusion_tag('tracker/intermittent_fasting_tracker.html')
+def intermittent_fasting_tracker():
+    """Template tag to include the intermittent fasting tracker component."""
+    return {}

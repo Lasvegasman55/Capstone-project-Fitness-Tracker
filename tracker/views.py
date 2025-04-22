@@ -10,7 +10,7 @@ from django.contrib.auth import login
 from .models import (
     Profile, Goal, Exercise, ExerciseCategory, 
     Workout, WorkoutExercise, BodyMeasurement,
-    NutritionEntry, WaterIntake
+    NutritionEntry, WaterIntake, FastingSession
 )
 from .forms import (
     UserRegistrationForm, ProfileForm, GoalForm,
@@ -70,13 +70,20 @@ def dashboard(request):
         date=today
     ).aggregate(Sum('amount'))['amount__sum'] or 0
     
+    # Get active fasting session if any
+    active_fasting = FastingSession.objects.filter(
+        user=request.user,
+        is_active=True
+    ).first()
+    
     context = {
         'recent_workouts': recent_workouts,
         'active_goals': active_goals,
         'latest_measurement': latest_measurement,
         'workouts_this_week': workouts_this_week,
         'calories_today': calories_today,
-        'water_today': water_today
+        'water_today': water_today,
+        'active_fasting': active_fasting
     }
     
     return render(request, 'tracker/dashboard.html', context)
@@ -500,3 +507,131 @@ def analytics(request):
     }
     
     return render(request, 'tracker/analytics.html', context)
+
+# Fasting Views
+@login_required
+def fasting_dashboard(request):
+    # Get active fasting session
+    active_session = FastingSession.objects.filter(
+        user=request.user,
+        is_active=True
+    ).first()
+    
+    # Get recent fasting history
+    recent_sessions = FastingSession.objects.filter(
+        user=request.user,
+        is_active=False
+    ).order_by('-start_time')[:5]
+    
+    # Calculate streak (consecutive completed sessions)
+    streak = 0
+    for session in FastingSession.objects.filter(
+        user=request.user,
+        is_active=False,
+        completed=True
+    ).order_by('-end_time'):
+        streak += 1
+    
+    context = {
+        'active_session': active_session,
+        'recent_sessions': recent_sessions,
+        'streak': streak
+    }
+    
+    # This is the corrected path
+    return render(request, 'tracker/fasting/dashboard.html', context)
+
+@login_required
+def fasting_start(request):
+    # Check if there's already an active session
+    existing_active = FastingSession.objects.filter(
+        user=request.user, 
+        is_active=True
+    ).exists()
+    
+    if existing_active:
+        messages.warning(request, 'You already have an active fasting session')
+        return redirect('fasting_dashboard')
+    
+    if request.method == 'POST':
+        # Extract data from form
+        protocol = request.POST.get('protocol')
+        custom_hours = request.POST.get('custom_hours')
+        
+        # Create new fasting session
+        session = FastingSession(
+            user=request.user,
+            start_time=timezone.now(),
+            protocol=protocol,
+            is_active=True
+        )
+        
+        # Set planned duration based on protocol
+        if protocol == 'custom':
+            try:
+                custom_hours = int(custom_hours)
+                session.custom_hours = custom_hours
+                session.planned_duration = custom_hours
+            except (ValueError, TypeError):
+                messages.error(request, 'Invalid custom hours value')
+                return redirect('fasting_start')
+        else:
+            protocol_hours = {
+                '16_8': 16,
+                '18_6': 18,
+                '20_4': 20,
+                '5_2': 120  # 5 days in hours
+            }.get(protocol, 16)
+            session.planned_duration = protocol_hours
+        
+        session.save()
+        messages.success(request, f'Started a new {session.get_protocol_display()} fasting session!')
+        return redirect('fasting_dashboard')
+    
+    return render(request, 'tracker/fasting/start.html', {'protocols': FastingSession.PROTOCOL_CHOICES})
+
+@login_required
+def fasting_end(request, pk):
+    session = get_object_or_404(FastingSession, pk=pk, user=request.user, is_active=True)
+    
+    if request.method == 'POST':
+        notes = request.POST.get('notes', '')
+        completed = request.POST.get('completed') == 'true'
+        
+        session.is_active = False
+        session.completed = completed
+        session.end_time = timezone.now()
+        session.notes = notes
+        session.save()
+        
+        if completed:
+            messages.success(request, 'Congratulations on completing your fast!')
+        else:
+            messages.info(request, 'Your fasting session has been ended early.')
+        
+        return redirect('fasting_dashboard')
+    
+    return render(request, 'tracker/fasting/end.html', {'session': session})
+
+@login_required
+def fasting_history(request):
+    sessions = FastingSession.objects.filter(
+        user=request.user
+    ).order_by('-start_time')
+    
+    # Calculate stats
+    total_sessions = sessions.count()
+    completed_sessions = sessions.filter(completed=True).count()
+    completion_rate = round((completed_sessions / total_sessions) * 100) if total_sessions > 0 else 0
+    
+    longest_session = sessions.filter(completed=True).order_by('-planned_duration').first()
+    
+    context = {
+        'sessions': sessions,
+        'total_sessions': total_sessions,
+        'completed_sessions': completed_sessions,
+        'completion_rate': completion_rate,
+        'longest_session': longest_session
+    }
+    
+    return render(request, 'tracker/fasting/history.html', context)

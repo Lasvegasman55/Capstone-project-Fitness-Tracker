@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}End Fasting Session{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>End Fasting Session</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Current Session Details</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Protocol:</strong> {{ session.get_protocol_display }}</p>
+            <p><strong>Started:</strong> {{ session.start_time }}</p>
+            <p><strong>Duration So Far:</strong> 
+                {% with current_time=session.start_time|timesince %}
+                    {{ current_time }}
+                {% endwith %}
+            </p>
+            
+            <div class="progress mb-3">
+                <div class="progress-bar bg-success" role="progressbar" 
+                     style="width: 50%;" 
+                     aria-valuenow="50" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    50%
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes (Optional)</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3" 
+                              placeholder="How did you feel during this fast? Any observations?"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="completed" id="completedTrue" 
+                               value="true" checked>
+                        <label class="form-check-label" for="completedTrue">
+                            <span class="text-success">Complete Fast</span> 
+                            (I reached my fasting goal)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="completed" id="completedFalse" 
+                               value="false">
+                        <label class="form-check-label" for="completedFalse">
+                            <span class="text-warning">End Early</span> 
+                            (I'm ending before reaching my goal)
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">End Fasting Session</button>
+                <a href="{% url 'fasting_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
