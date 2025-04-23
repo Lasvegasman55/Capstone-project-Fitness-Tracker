@@ -27,8 +27,8 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Create a profile for the user
-            Profile.objects.create(user=user)
+            # Use get_or_create instead of create to prevent unique constraint error
+            Profile.objects.get_or_create(user=user)
             login(request, user)
             messages.success(request, f'Account created successfully. Welcome to FitTrack!')
             return redirect('dashboard')
