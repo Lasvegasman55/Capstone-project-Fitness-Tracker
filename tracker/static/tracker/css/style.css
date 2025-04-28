@@ -1,6 +1,5 @@
 /* Custom Styles for FitTrack */
 
-
 .img-small {
     width: 300px;
     height: auto;
@@ -174,4 +173,54 @@ input[type="date"] {
     color: red;
     font-size: 1.5rem;
     margin-bottom: 25px;
+}
+
+/* Chat Styles */
+.chat-container {
+    height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.message {
+    margin-bottom: 15px;
+    clear: both;
+}
+
+.user-message .message-content {
+    background-color: #4e73df;
+    color: white;
+    float: right;
+    border-radius: 15px 15px 0 15px;
+}
+
+.assistant-message .message-content {
+    background-color: #e9ecef;
+    color: #212529;
+    float: left;
+    border-radius: 15px 15px 15px 0;
+}
+
+.message-content {
+    padding: 10px 15px;
+    max-width: 80%;
+    display: inline-block;
+    word-wrap: break-word;
+}
+
+.message-time {
+    clear: both;
+    display: block;
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* Ensure proper clearfix after messages */
+.clearfix {
+    clear: both;
+    display: table;
 }

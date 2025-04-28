@@ -5,12 +5,25 @@ from django.db.models import Sum, Avg
 from django.utils import timezone
 from datetime import timedelta, date
 from django.contrib.auth import login
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+import os
+
+# REST Framework imports
+from rest_framework import viewsets
+from .serializers import (
+    ProfileSerializer, GoalSerializer, ExerciseSerializer, 
+    WorkoutSerializer, FastingSessionSerializer, BodyMeasurementSerializer,
+    NutritionEntrySerializer, WaterIntakeSerializer
+)
 
 from .models import (
     Profile, Goal, Exercise, ExerciseCategory, 
     Workout, WorkoutExercise, BodyMeasurement,
-    NutritionEntry, WaterIntake, FastingSession
+    NutritionEntry, WaterIntake, FastingSession,
+    ChatMessage  # Make sure this is imported
 )
 from .forms import (
     UserRegistrationForm, ProfileForm, GoalForm,
@@ -170,7 +183,7 @@ def workout_list(request):
 
 @login_required
 def workout_detail(request, pk):
-    workout = get_object_or_404(Workout, id=pk)
+    workout = get_object_or_404(Workout, id=pk, user=request.user)
     exercises = workout.exercises.all().order_by('order')
     
     context = {
@@ -407,14 +420,10 @@ def water_list(request):
         date=selected_date
     ).order_by('time')
     
-    # Add debug print to help troubleshoot
-    print(f"Water intakes for {selected_date}: {intakes.count()}")
-    
     total_intake = intakes.aggregate(Sum('amount'))['amount__sum'] or 0
-    print(f"Total water intake: {total_intake}ml")
     
-    # Calculate percentage of daily goal (3000ml)
-    daily_goal = 3000
+    # Get user's daily water goal from profile or use default
+    daily_goal = getattr(request.user.profile, 'water_goal', 3000)  # Default to 3000ml if not set
     percentage = min(100, round((total_intake / daily_goal) * 100)) if total_intake else 0
     
     context = {
@@ -435,8 +444,6 @@ def water_add(request):
             water = form.save(commit=False)
             water.user = request.user
             water.save()
-            # Add debug print
-            print(f"Added water: {water.amount}ml on {water.date}")
             messages.success(request, f'Added {water.amount}ml of water!')
             return redirect('water_list')
     else:
@@ -538,7 +545,6 @@ def fasting_dashboard(request):
         'streak': streak
     }
     
-    # This is the corrected path
     return render(request, 'tracker/fasting/dashboard.html', context)
 
 @login_required
@@ -635,3 +641,157 @@ def fasting_history(request):
     }
     
     return render(request, 'tracker/fasting/history.html', context)
+
+# Chat with AI Assistant
+@login_required
+def chat_view(request):
+    # Get chat history
+    messages_history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')
+    
+    if request.method == 'POST':
+        user_message = request.POST.get('message', '').strip()
+        
+        if user_message:
+            # Save user message
+            ChatMessage.objects.create(
+                user=request.user,
+                is_user=True,
+                message=user_message
+            )
+            
+            # Get AI response
+            ai_response = get_ai_response(request.user, user_message)
+            
+            # Save AI response
+            ChatMessage.objects.create(
+                user=request.user,
+                is_user=False,
+                message=ai_response
+            )
+            
+            return redirect('chat')
+    
+    return render(request, 'tracker/chat/chat.html', {'messages': messages_history})
+
+def get_ai_response(user, message):
+    """Get response from AI service without external API dependency"""
+    try:
+        # Get user context information
+        recent_workouts = Workout.objects.filter(user=user).order_by('-date')[:3]
+        active_goals = Goal.objects.filter(user=user, completed=False)[:3]
+        latest_measurement = BodyMeasurement.objects.filter(user=user).order_by('-date').first()
+        
+        # Create rule-based responses based on keywords
+        message_lower = message.lower()
+        
+        if 'chest' in message_lower and ('workout' in message_lower or 'exercise' in message_lower):
+            return "For chest development, the best exercises include bench press (flat, incline, and decline), push-ups, dumbbell flyes, and cable crossovers. Aim for 3-4 sets of 8-12 reps for hypertrophy, or 4-6 reps for strength. Make sure to incorporate proper form and adequate rest between workouts."
+        
+        elif 'workout' in message_lower:
+            if recent_workouts:
+                return f"I see you've recently done these workouts: {', '.join([w.title for w in recent_workouts])}. Would you like suggestions for your next workout?"
+            else:
+                return "You haven't logged any workouts recently. Would you like some workout suggestions to get started?"
+        
+        elif 'goal' in message_lower:
+            if active_goals:
+                return f"You're currently working on these goals: {', '.join([g.title for g in active_goals])}. Keep up the good work!"
+            else:
+                return "You don't have any active goals. Setting specific fitness goals can help keep you motivated!"
+        
+        elif 'weight' in message_lower or 'measurement' in message_lower:
+            if latest_measurement and hasattr(latest_measurement, 'weight') and latest_measurement.weight:
+                return f"Your most recent weight measurement was {latest_measurement.weight} kg. Remember that weight is just one metric of fitness progress!"
+            else:
+                return "You haven't recorded any recent measurements. Regular tracking can help you see your progress over time."
+        
+        elif 'water' in message_lower or 'hydration' in message_lower:
+            return "Staying hydrated is crucial for fitness! Aim for at least 2-3 liters of water daily, more during intense workouts."
+        
+        elif 'nutrition' in message_lower or 'diet' in message_lower or 'food' in message_lower:
+            return "A balanced diet is essential for fitness. Focus on lean proteins, complex carbohydrates, healthy fats, and plenty of fruits and vegetables. Remember to adjust your caloric intake based on your fitness goals."
+        
+        elif 'motivation' in message_lower or 'tired' in message_lower or 'giving up' in message_lower:
+            return "Remember why you started! Every workout gets you closer to your goals, even on tough days. Try mixing up your routine if you're feeling unmotivated."
+        
+        else:
+            return "I'm here to help with your fitness journey! You can ask me about workouts, goals, nutrition, or measurements, or ask for general fitness advice."
+    
+    except Exception as e:
+        return f"I'm sorry, I had trouble processing your request: {str(e)}. Try asking something about workouts, goals, or measurements."
+
+# API ViewSets
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    
+    def get_queryset(self):
+        # Only return the current user's profile
+        return Profile.objects.filter(user=self.request.user)
+
+class GoalViewSet(viewsets.ModelViewSet):
+    queryset = Goal.objects.all()
+    serializer_class = GoalSerializer
+    
+    def get_queryset(self):
+        # Only return the current user's goals
+        return Goal.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        # Automatically set the user when creating
+        serializer.save(user=self.request.user)
+
+class ExerciseViewSet(viewsets.ModelViewSet):
+    queryset = Exercise.objects.all()
+    serializer_class = ExerciseSerializer
+
+class WorkoutViewSet(viewsets.ModelViewSet):
+    queryset = Workout.objects.all()
+    serializer_class = WorkoutSerializer
+    
+    def get_queryset(self):
+        return Workout.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class FastingSessionViewSet(viewsets.ModelViewSet):
+    queryset = FastingSession.objects.all()
+    serializer_class = FastingSessionSerializer
+    
+    def get_queryset(self):
+        return FastingSession.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class BodyMeasurementViewSet(viewsets.ModelViewSet):
+    queryset = BodyMeasurement.objects.all()
+    serializer_class = BodyMeasurementSerializer
+    
+    def get_queryset(self):
+        return BodyMeasurement.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class NutritionEntryViewSet(viewsets.ModelViewSet):
+    queryset = NutritionEntry.objects.all()
+    serializer_class = NutritionEntrySerializer
+    
+    def get_queryset(self):
+        return NutritionEntry.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class WaterIntakeViewSet(viewsets.ModelViewSet):
+    queryset = WaterIntake.objects.all()
+    serializer_class = WaterIntakeSerializer
+    
+    def get_queryset(self):
+        return WaterIntake.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+

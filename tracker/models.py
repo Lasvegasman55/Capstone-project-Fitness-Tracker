@@ -204,3 +204,17 @@ class FastingSession(models.Model):
         
         percentage = min(100, (elapsed_hours / target_hours) * 100)
         return round(percentage, 1)
+    
+    # Add this to tracker/models.py
+class ChatMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_messages')
+    is_user = models.BooleanField(default=True)  # True if from user, False if from AI
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['timestamp']
+    
+    def __str__(self):
+        return f"{self.user.username}: {self.message[:30]}..."
+    

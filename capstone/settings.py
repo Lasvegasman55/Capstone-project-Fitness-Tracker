@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +29,15 @@ SECRET_KEY = 'django-insecure-98#$-^+r5xsb#5*=gmjpi((&@ptol394mu*i2bi+)s&#s3h27w
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+CORS_ALLOW_ALL_ORIGINS = True 
 ALLOWED_HOSTS = []
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/tracker/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'  # Redirect to login page after logout
+
+# Get OpenAI API key from environment variables
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 
 # Application definition
 
@@ -45,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',  # For API endpoints
     'crispy_forms',  # For better forms
     'crispy_bootstrap5',  # If using Bootstrap 5
+    'corsheaders',
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -60,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'capstone.urls'
@@ -118,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Los_Angeles'
 
 USE_I18N = True
 
@@ -128,7 +137,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

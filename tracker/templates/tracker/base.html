@@ -119,6 +119,12 @@
         </div>
     </nav>
 
+    <li class="nav-item">
+        <a class="nav-link {% if 'chat' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'chat' %}">
+            <i class="fas fa-robot me-1"></i> AI Assistant
+        </a>
+    </li>
+
     <!-- Messages -->
     {% if messages %}
         <div class="container mt-3">
