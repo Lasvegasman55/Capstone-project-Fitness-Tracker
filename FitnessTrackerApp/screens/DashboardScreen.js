@@ -1,45 +1,71 @@
 // screens/DashboardScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const DashboardScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Fitness Dashboard</Text>
+        <Text style={styles.headerText}>Dashboard</Text>
       </View>
       
+      {/* Today's Stats Section */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Recent Activity</Text>
-        <Text style={styles.cardContent}>No recent activities found.</Text>
-      </View>
-      
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Active Goals</Text>
-        <Text style={styles.cardContent}>No active goals found.</Text>
-      </View>
-      
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Today's Summary</Text>
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>0</Text>
-            <Text style={styles.summaryLabel}>Workouts</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>0</Text>
-            <Text style={styles.summaryLabel}>Calories</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>0ml</Text>
-            <Text style={styles.summaryLabel}>Water</Text>
-          </View>
+        <Text style={styles.cardTitle}>Today's Stats</Text>
+        <View style={styles.statRow}>
+          <Ionicons name="flame-outline" size={20} color="#333" />
+          <Text style={styles.statLabel}>Calories</Text>
+          <Text style={styles.statValue}>0 kcal</Text>
+        </View>
+        <View style={styles.statRow}>
+          <Ionicons name="water-outline" size={20} color="#333" />
+          <Text style={styles.statLabel}>Water</Text>
+          <Text style={styles.statValue}>0 ml</Text>
+        </View>
+        <View style={styles.statRow}>
+          <Ionicons name="barbell-outline" size={20} color="#333" />
+          <Text style={styles.statLabel}>This week's workouts</Text>
+          <Text style={styles.statValue}>0</Text>
+        </View>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Log Food</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Log Water</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Log Workout</Text>
+          </TouchableOpacity>
         </View>
       </View>
       
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Fasting Status</Text>
-        <Text style={styles.cardContent}>Not currently fasting</Text>
+      {/* Recent Workouts Section */}
+      <View style={[styles.card, styles.greenCard]}>
+        <Text style={styles.cardTitle}>Recent Workouts</Text>
+        <Text style={styles.emptyState}>No workouts recorded yet.</Text>
+        <TouchableOpacity style={styles.viewAllButton}>
+          <Text style={styles.viewAllButtonText}>View All Workouts</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* Active Goals Section */}
+      <View style={[styles.card, styles.yellowCard]}>
+        <Text style={styles.cardTitle}>Active Goals</Text>
+        <Text style={styles.emptyState}>No active goals found.</Text>
+        <TouchableOpacity style={styles.viewAllButton}>
+          <Text style={styles.viewAllButtonText}>View All Goals</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* Body Measurements Section */}
+      <View style={[styles.card, styles.blueCard]}>
+        <Text style={styles.cardTitle}>Body Measurements</Text>
+        <Text style={styles.emptyState}>No measurements recorded yet.</Text>
+        <TouchableOpacity style={styles.recordButton}>
+          <Text style={styles.buttonText}>Record Measurements</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -51,7 +77,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    padding: 20,
+    padding: 15,
     backgroundColor: '#4CAF50',
   },
   headerText: {
@@ -70,30 +96,77 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  greenCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#4CAF50',
+  },
+  yellowCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#FFC107',
+  },
+  blueCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#03A9F4',
+  },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 15,
   },
-  cardContent: {
-    fontSize: 16,
-    color: '#666',
-  },
-  summaryRow: {
+  statRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  summaryItem: {
     alignItems: 'center',
-    flex: 1,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
-  summaryValue: {
-    fontSize: 20,
+  statLabel: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  statValue: {
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  summaryLabel: {
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 15,
+  },
+  button: {
+    backgroundColor: '#e0e0e0',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  buttonText: {
     fontSize: 14,
+    color: '#333',
+  },
+  emptyState: {
     color: '#666',
+    fontStyle: 'italic',
+    marginBottom: 15,
+  },
+  viewAllButton: {
+    alignSelf: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+  },
+  viewAllButtonText: {
+    color: '#666',
+    fontSize: 14,
+  },
+  recordButton: {
+    alignSelf: 'center',
+    backgroundColor: '#e0e0e0',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
   },
 });
 

@@ -1,15 +1,40 @@
-// App.js
+// App.js - Simplified version with proper syntax
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-// Import screens (we'll create these next)
-import DashboardScreen from './screens/DashboardScreen';
-import WorkoutsScreen from './screens/WorkoutsScreen';
-import NutritionScreen from './screens/NutritionScreen';
-import FastingScreen from './screens/FastingScreen';
-import ProfileScreen from './screens/ProfileScreen';
+// Simple placeholder components
+const DashboardScreen = () => (
+  <View style={styles.screen}>
+    <Text style={styles.title}>Dashboard</Text>
+  </View>
+);
+
+const WorkoutsScreen = () => (
+  <View style={styles.screen}>
+    <Text style={styles.title}>Workouts</Text>
+  </View>
+);
+
+const NutritionScreen = () => (
+  <View style={styles.screen}>
+    <Text style={styles.title}>Nutrition</Text>
+  </View>
+);
+
+const FastingScreen = () => (
+  <View style={styles.screen}>
+    <Text style={styles.title}>Fasting</Text>
+  </View>
+);
+
+const ProfileScreen = () => (
+  <View style={styles.screen}>
+    <Text style={styles.title}>Profile</Text>
+  </View>
+);
 
 const Tab = createBottomTabNavigator();
 
@@ -37,6 +62,10 @@ export default function App() {
           },
           tabBarActiveTintColor: '#4CAF50',
           tabBarInactiveTintColor: 'gray',
+          headerStyle: {
+            backgroundColor: '#4CAF50',
+          },
+          headerTintColor: '#fff',
         })}
       >
         <Tab.Screen name="Dashboard" component={DashboardScreen} />
@@ -48,3 +77,17 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  }
+});
