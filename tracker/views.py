@@ -795,3 +795,11 @@ class WaterIntakeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+@login_required
+def clear_chat(request):
+    if request.method == 'POST':
+        # Delete all chat messages for this user
+        ChatMessage.objects.filter(user=request.user).delete()
+        messages.success(request, 'Chat history cleared!')
+    return redirect('chat')
+

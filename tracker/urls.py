@@ -67,4 +67,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
 
     path('chat/', views.chat_view, name='chat'),
+
+    path('tracker/chat/clear/', views.clear_chat, name='clear_chat'),
 ]

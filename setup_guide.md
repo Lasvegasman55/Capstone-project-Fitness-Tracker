@@ -6,7 +6,7 @@ This guide will help you set up and run your Personal Fitness Tracker applicatio
 
 ```bash
 # Create a virtual environment
-python -m venv fitness_env
+python3 -m venv fitness_env
 
 # Activate the virtual environment
 # On Windows
@@ -15,24 +15,24 @@ fitness_env\Scripts\activate
 source fitness_env/bin/activate
 
 # Install dependencies
-pip install django djangorestframework django-crispy-forms crispy-bootstrap5 pillow
+pip3 install django djangorestframework django-crispy-forms crispy-bootstrap5 pillow
 ```
 
 ## 2. Run Migrations
 
 ```bash
 # Generate migration files
-python manage.py makemigrations tracker
+python3 manage.py makemigrations tracker
 
 # Apply migrations to create database tables
-python manage.py migrate
+python3 manage.py migrate
 ```
 
 ## 3. Create a Superuser
 
 ```bash
 # Create an admin user
-python manage.py createsuperuser
+python3 manage.py createsuperuser
 ```
 
 ## 4. Populate Exercise Data

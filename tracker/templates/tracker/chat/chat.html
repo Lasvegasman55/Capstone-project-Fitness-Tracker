@@ -21,6 +21,10 @@
                                     <div class="clearfix"></div>
                                     <small class="text-muted">{{ message.timestamp|date:'g:i A, M d' }}</small>
                                 </div>
+                                <form method="post" action="{% url 'clear_chat' %}" class="mb-3">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger">Clear Conversation</button>
+                                </form>
                             {% endfor %}
                         {% else %}
                             <div class="text-center text-muted">
