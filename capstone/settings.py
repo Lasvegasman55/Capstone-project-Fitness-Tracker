@@ -26,7 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'FitnessTrackerApp',
-    'tracker',  # Make sure this is included
+    'tracker', 
+    'django_extensions', 
 ]
 
 MIDDLEWARE = [
