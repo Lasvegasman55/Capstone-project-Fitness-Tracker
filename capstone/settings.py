@@ -1,5 +1,4 @@
 import os
-import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -12,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-development-secret-key-replace-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') != 'False'
+DEBUG = os.environ.get('DEBUG', 'True') != 'False'
 
 # Allow all hosts for Heroku
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', 'fittraxx.herokuapp.com']
@@ -28,7 +27,12 @@ INSTALLED_APPS = [
     'FitnessTrackerApp',
     'tracker', 
     'django_extensions', 
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,6 +76,7 @@ DATABASES = {
 
 # Update database configuration with $DATABASE_URL for Heroku
 if 'DATABASE_URL' in os.environ:
+    import dj_database_url
     DATABASES['default'] = dj_database_url.config(
         conn_max_age=600, ssl_require=True)
 
