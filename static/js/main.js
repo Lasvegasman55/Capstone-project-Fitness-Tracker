@@ -1,0 +1,1 @@
+console.log("JS worked, check static>main.js");

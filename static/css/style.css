@@ -1,0 +1,226 @@
+/* Custom Styles for FitTrack */
+
+.img-small {
+    width: 300px;
+    height: auto;
+}
+/* General Styles */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+/* Dashboard Stats */
+.stat-card {
+    background: linear-gradient(45deg, #3a8ddf, #5cb7d8);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: scale(1.03);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Progress Bars */
+.progress {
+    height: 10px;
+    border-radius: 5px;
+}
+
+/* Form Styles */
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    border-color: #86b7fe;
+}
+
+/* Custom Colors */
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #3a8ddf, #5cb7d8);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(45deg, #28a745, #20c997);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14);
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(45deg, #dc3545, #e74c3c);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(45deg, #17a2b8, #00bcd4);
+}
+
+/* Charts/Analytics Section */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+/* Workout Log Styles */
+.exercise-row {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* Goal Item Styles */
+.goal-item {
+    border-left: 5px solid #007bff;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: white;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.goal-item:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.goal-item.completed {
+    border-left-color: #28a745;
+}
+
+/* Custom Width for Date Inputs */
+input[type="date"] {
+    width: 170px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* Dark Mode Styles - for future implementation */
+.dark-mode {
+    background-color: #343a40;
+    color: #f8f9fa;
+}
+
+.dark-mode .card {
+    background-color: #454d55;
+    color: #f8f9fa;
+}
+
+.dark-mode .card-header {
+    background-color: #3d4349;
+    border-bottom: 1px solid #2c3237;
+}
+
+.dark-mode .list-group-item {
+    background-color: #454d55;
+    color: #f8f9fa;
+    border-color: #2c3237;
+}
+
+.developer-title {
+    color: red;
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+}
+
+/* Chat Styles */
+.chat-container {
+    height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.message {
+    margin-bottom: 15px;
+    clear: both;
+}
+
+.user-message .message-content {
+    background-color: #4e73df;
+    color: white;
+    float: right;
+    border-radius: 15px 15px 0 15px;
+}
+
+.assistant-message .message-content {
+    background-color: #e9ecef;
+    color: #212529;
+    float: left;
+    border-radius: 15px 15px 15px 0;
+}
+
+.message-content {
+    padding: 10px 15px;
+    max-width: 80%;
+    display: inline-block;
+    word-wrap: break-word;
+}
+
+.message-time {
+    clear: both;
+    display: block;
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* Ensure proper clearfix after messages */
+.clearfix {
+    clear: both;
+    display: table;
+}
