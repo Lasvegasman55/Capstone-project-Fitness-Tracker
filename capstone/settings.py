@@ -50,7 +50,10 @@ ROOT_URLCONF = 'capstone.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'tracker/templates'), 
+            os.path.join(BASE_DIR, 'tracker/templates/tracker')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
