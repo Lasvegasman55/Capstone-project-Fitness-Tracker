@@ -103,7 +103,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Only add static directory if it exists
 static_dir = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [static_dir] if os.path.exists(static_dir) else []
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # WhiteNoise for serving static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -115,4 +115,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = bool(os.environ.get('DJANGO_SECURE_SSL_REDIRECT', False))
 SESSION_COOKIE_SECURE = bool(os.environ.get('DJANGO_SESSION_COOKIE_SECURE', False))
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
