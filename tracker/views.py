@@ -6,6 +6,7 @@ from django.utils import timezone
 from datetime import timedelta, date
 from django.contrib.auth import login
 from dotenv import load_dotenv
+from django.shortcuts import render
 
 # Load environment variables
 load_dotenv()
@@ -802,4 +803,7 @@ def clear_chat(request):
         ChatMessage.objects.filter(user=request.user).delete()
         messages.success(request, 'Chat history cleared!')
     return redirect('chat')
+
+def profile_view(request):
+    return render(request, 'tracker/profile.html') 
 

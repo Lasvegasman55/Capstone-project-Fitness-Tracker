@@ -12,6 +12,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'your-development-secret-key-replace-i
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') != 'False'
+LOGIN_REDIRECT_URL = '/' 
 
 # Allow all hosts for Heroku
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', 'fittraxx.herokuapp.com']

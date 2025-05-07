@@ -1,6 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+from django.urls import path
+from tracker.views import profile_view 
 
 # Create a router for REST API
 router = DefaultRouter()
@@ -19,7 +21,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
-    
+    path('accounts/profile/', profile_view, name='profile'),
     # Goals URLs
     path('goals/', views.goal_list, name='goal_list'),
     path('goals/create/', views.goal_create, name='goal_create'),
