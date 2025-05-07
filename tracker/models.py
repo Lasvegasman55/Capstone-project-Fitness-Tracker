@@ -1,220 +1,154 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from decimal import Decimal
+
+# Conversion constants
+ML_TO_OZ = Decimal('0.033814')
+OZ_TO_ML = Decimal('29.5735')
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    height = models.FloatField(null=True, blank=True, help_text="Height in cm")
-    weight = models.FloatField(null=True, blank=True, help_text="Weight in kg")
     date_of_birth = models.DateField(null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics', default='default.jpg')
+    height = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in cm
+    weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in kg
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    water_unit_preference = models.CharField(
+        max_length=2, 
+        choices=[('ml', 'Milliliters'), ('oz', 'Ounces')], 
+        default='ml'
+    )
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
 class Goal(models.Model):
-    GOAL_TYPES = (
-        ('weight', 'Weight Goal'),
-        ('strength', 'Strength Goal'),
-        ('endurance', 'Endurance Goal'),
-        ('habit', 'Habit Formation'),
-    )
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='goals')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    goal_type = models.CharField(max_length=20, choices=GOAL_TYPES)
-    target_value = models.FloatField(null=True, blank=True, help_text="Target numerical value if applicable")
     target_date = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
-    completed_at = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
         return self.title
 
-class ExerciseCategory(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(blank=True)
-    
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        verbose_name_plural = "Exercise Categories"
-
-class MuscleGroup(models.Model):
-    name = models.CharField(max_length=100)
-    
-    def __str__(self):
-        return self.name
-
 class Exercise(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    category = models.ForeignKey(ExerciseCategory, on_delete=models.CASCADE, related_name='exercises')
-    primary_muscle_group = models.CharField(max_length=50, blank=True)
-    is_cardio = models.BooleanField(default=False)
+    category = models.CharField(max_length=50, blank=True)
     
     def __str__(self):
         return self.name
 
 class Workout(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workouts')
-    title = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    duration = models.IntegerField(help_text="Duration in minutes")
     notes = models.TextField(blank=True)
-    date = models.DateField(default=timezone.now)
-    duration = models.DurationField(null=True, blank=True)
-    calories_burned = models.PositiveIntegerField(null=True, blank=True)
+    exercises = models.ManyToManyField(Exercise, through='WorkoutExercise')
     
     def __str__(self):
-        return f"{self.title} on {self.date}"
+        return f"{self.user.username}'s workout on {self.date}"
 
 class WorkoutExercise(models.Model):
-    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, related_name='exercises')
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
-    order = models.PositiveSmallIntegerField(default=0)
-    
-    # For strength exercises
-    sets = models.PositiveSmallIntegerField(null=True, blank=True)
-    reps = models.PositiveSmallIntegerField(null=True, blank=True)
-    weight = models.FloatField(null=True, blank=True, help_text="Weight in kg")
-    
-    # For cardio exercises
-    distance = models.FloatField(null=True, blank=True, help_text="Distance in km")
-    duration = models.DurationField(null=True, blank=True)
-    
-    notes = models.TextField(blank=True)
-    
-    class Meta:
-        ordering = ['order']
+    sets = models.IntegerField()
+    reps = models.IntegerField()
+    weight = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     
     def __str__(self):
-        return f"{self.exercise.name} in {self.workout.title}"
+        return f"{self.exercise.name} - {self.sets} sets of {self.reps}"
+
+class FastingSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True, blank=True)
+    protocol = models.CharField(max_length=50, default="16:8")
+    completed = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.user.username}'s fasting session on {self.start_time.date()}"
 
 class BodyMeasurement(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='measurements')
-    date = models.DateField(default=timezone.now)
-    weight = models.FloatField(null=True, blank=True, help_text="Weight in kg")
-    body_fat_percentage = models.FloatField(null=True, blank=True)
-    chest = models.FloatField(null=True, blank=True, help_text="Measurement in cm")
-    waist = models.FloatField(null=True, blank=True, help_text="Measurement in cm")
-    hips = models.FloatField(null=True, blank=True, help_text="Measurement in cm")
-    arms = models.FloatField(null=True, blank=True, help_text="Measurement in cm")
-    thighs = models.FloatField(null=True, blank=True, help_text="Measurement in cm")
-    notes = models.TextField(blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in kg
+    body_fat_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    chest = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in cm
+    waist = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in cm
+    hips = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in cm
+    arms = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in cm
+    thighs = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # in cm
     
     def __str__(self):
-        return f"Measurements for {self.user.username} on {self.date}"
+        return f"{self.user.username}'s measurements on {self.date}"
 
 class NutritionEntry(models.Model):
-    MEAL_TYPES = (
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    meal_type = models.CharField(max_length=50, choices=[
         ('breakfast', 'Breakfast'),
         ('lunch', 'Lunch'),
         ('dinner', 'Dinner'),
-        ('snack', 'Snack'),
-    )
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='nutrition_entries')
-    date = models.DateField(default=timezone.now)
-    meal_type = models.CharField(max_length=20, choices=MEAL_TYPES)
-    food_name = models.CharField(max_length=100)
-    calories = models.PositiveIntegerField()
-    protein = models.FloatField(null=True, blank=True, help_text="Protein in grams")
-    carbs = models.FloatField(null=True, blank=True, help_text="Carbohydrates in grams")
-    fat = models.FloatField(null=True, blank=True, help_text="Fat in grams")
-    notes = models.TextField(blank=True)
+        ('snack', 'Snack')
+    ])
+    food_item = models.CharField(max_length=100)
+    calories = models.IntegerField()
+    protein = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)  # in grams
+    carbs = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)  # in grams
+    fat = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)  # in grams
     
     def __str__(self):
-        return f"{self.food_name} ({self.meal_type}) on {self.date}"
-    
-    class Meta:
-        verbose_name_plural = "Nutrition Entries"
+        return f"{self.food_item} - {self.user.username} on {self.date}"
 
 class WaterIntake(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='water_intake')
-    date = models.DateField(default=timezone.now)
-    amount = models.FloatField(help_text="Amount in ml")
-    time = models.TimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+    amount = models.DecimalField(max_digits=8, decimal_places=2)  # Always stored in ml
+    unit = models.CharField(
+        max_length=2, 
+        choices=[('ml', 'Milliliters'), ('oz', 'Ounces')], 
+        default='ml'
+    )
+    
+    def save(self, *args, **kwargs):
+        # Convert to ml before saving if entered as oz
+        if self.unit == 'oz':
+            self.amount = self.amount * OZ_TO_ML
+            self.unit = 'ml'  # Always store in ml
+        super().save(*args, **kwargs)
+    
+    def get_amount_in_ml(self):
+        return self.amount
+    
+    def get_amount_in_oz(self):
+        return self.amount * ML_TO_OZ
+    
+    def get_amount_in_user_preferred_unit(self):
+        try:
+            preference = self.user.profile.water_unit_preference
+            if preference == 'oz':
+                return self.get_amount_in_oz()
+            else:
+                return self.amount
+        except:
+            return self.amount
     
     def __str__(self):
-        return f"{self.amount}ml on {self.date}"
-
-class FastingSession(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fasting_sessions')
-    
-    # Fasting details
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField(null=True, blank=True)
-    planned_duration = models.PositiveIntegerField(help_text="Planned fasting duration in hours")
-    
-    # Protocol choices
-    PROTOCOL_CHOICES = [
-        ('16_8', '16:8 (Leangains)'),
-        ('18_6', '18:6'),
-        ('20_4', '20:4 (Warrior Diet)'),
-        ('5_2', '5:2 (5 normal days, 2 fasting days)'),
-        ('custom', 'Custom'),
-    ]
-    protocol = models.CharField(max_length=10, choices=PROTOCOL_CHOICES, default='16_8')
-    custom_hours = models.PositiveIntegerField(null=True, blank=True, help_text="For custom protocol, hours to fast")
-    
-    # Status
-    is_active = models.BooleanField(default=True)
-    completed = models.BooleanField(default=False)
-    
-    # Notes/Journal
-    notes = models.TextField(blank=True, null=True)
-    
-    # Metadata
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+        return f"{self.user.username}'s water intake on {self.date} at {self.time}"
     
     class Meta:
-        ordering = ['-start_time']
-    
-    def __str__(self):
-        return f"{self.user.username}'s fast - {self.get_protocol_display()} ({self.start_time.date()})"
-    
-    def duration_in_hours(self):
-        """Calculate actual duration of the fast in hours"""
-        if self.end_time:
-            delta = self.end_time - self.start_time
-            return round(delta.total_seconds() / 3600, 1)  # Convert to hours
-        return None
-    
-    def progress_percentage(self):
-        """Calculate the current progress percentage of the fast"""
-        if self.completed:
-            return 100
-            
-        if not self.is_active:
-            return 0
-            
-        current_time = timezone.now()
-        elapsed = current_time - self.start_time
-        elapsed_hours = elapsed.total_seconds() / 3600
-        
-        target_hours = self.custom_hours if self.protocol == 'custom' else {
-            '16_8': 16,
-            '18_6': 18,
-            '20_4': 20,
-            '5_2': 120,  # 5 days in hours
-        }.get(self.protocol, 16)
-        
-        percentage = min(100, (elapsed_hours / target_hours) * 100)
-        return round(percentage, 1)
-    
-    # Add this to tracker/models.py
-class ChatMessage(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_messages')
-    is_user = models.BooleanField(default=True)  # True if from user, False if from AI
-    message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        ordering = ['timestamp']
-    
-    def __str__(self):
-        return f"{self.user.username}: {self.message[:30]}..."
+        ordering = ['-date', '-time']
     

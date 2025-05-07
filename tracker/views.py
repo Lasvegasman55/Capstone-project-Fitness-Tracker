@@ -7,6 +7,8 @@ from datetime import timedelta, date
 from django.contrib.auth import login
 from dotenv import load_dotenv
 from django.shortcuts import render
+from django.http import JsonResponse
+from decimal import Decimal
 
 # Load environment variables
 load_dotenv()
@@ -31,6 +33,10 @@ from .forms import (
     WorkoutForm, WorkoutExerciseFormSet, BodyMeasurementForm,
     NutritionEntryForm, WaterIntakeForm
 )
+
+# Constants for unit conversion
+ML_TO_OZ = Decimal('0.033814')
+OZ_TO_ML = Decimal('29.5735')
 
 def welcome(request):
     """Display the welcome/landing page"""
@@ -84,6 +90,13 @@ def dashboard(request):
         date=today
     ).aggregate(Sum('amount'))['amount__sum'] or 0
     
+    # Convert water to oz if user prefers oz
+    water_unit_preference = getattr(request.user.profile, 'water_unit_preference', 'ml')
+    if water_unit_preference == 'oz':
+        water_today_display = water_today * ML_TO_OZ
+    else:
+        water_today_display = water_today
+    
     # Get active fasting session if any
     active_fasting = FastingSession.objects.filter(
         user=request.user,
@@ -96,7 +109,8 @@ def dashboard(request):
         'latest_measurement': latest_measurement,
         'workouts_this_week': workouts_this_week,
         'calories_today': calories_today,
-        'water_today': water_today,
+        'water_today': water_today_display,
+        'water_unit': water_unit_preference,
         'active_fasting': active_fasting
     }
     
@@ -423,6 +437,9 @@ def water_list(request):
     
     total_intake = intakes.aggregate(Sum('amount'))['amount__sum'] or 0
     
+    # Convert to ounces for display if needed
+    total_intake_oz = total_intake * ML_TO_OZ
+    
     # Get user's daily water goal from profile or use default
     daily_goal = getattr(request.user.profile, 'water_goal', 3000)  # Default to 3000ml if not set
     percentage = min(100, round((total_intake / daily_goal) * 100)) if total_intake else 0
@@ -430,6 +447,7 @@ def water_list(request):
     context = {
         'intakes': intakes,
         'total_intake': total_intake,
+        'total_intake_oz': total_intake_oz,
         'selected_date': selected_date,
         'percentage': percentage,
         'daily_goal': daily_goal
@@ -444,17 +462,84 @@ def water_add(request):
         if form.is_valid():
             water = form.save(commit=False)
             water.user = request.user
+            
+            # Handle unit conversion if needed
+            amount = form.cleaned_data['amount']
+            unit = request.POST.get('unit', 'ml')
+            
+            if unit == 'oz':
+                # Convert from oz to ml for storage
+                water.amount = amount * OZ_TO_ML
+            
             water.save()
-            messages.success(request, f'Added {water.amount}ml of water!')
+            
+            if unit == 'oz':
+                messages.success(request, f'Added {amount} oz of water!')
+            else:
+                messages.success(request, f'Added {amount} ml of water!')
+                
             return redirect('water_list')
     else:
+        # Get user's preferred unit
+        unit_preference = getattr(request.user.profile, 'water_unit_preference', 'ml')
+        
+        # Default amount based on user preference
+        default_amount = 250 if unit_preference == 'ml' else 8  # 8oz ~= 240ml
+        
         form = WaterIntakeForm(initial={
             'date': timezone.now().date(),
             'time': timezone.now().time(),
-            'amount': 250  # Default to 250ml
+            'amount': default_amount
         })
     
-    return render(request, 'tracker/water/water_form.html', {'form': form})
+    context = {
+        'form': form,
+        'unit': getattr(request.user.profile, 'water_unit_preference', 'ml')
+    }
+    
+    return render(request, 'tracker/water/water_form.html', context)
+
+@login_required
+def water_edit(request, pk):
+    intake = get_object_or_404(WaterIntake, pk=pk, user=request.user)
+    
+    if request.method == 'POST':
+        form = WaterIntakeForm(request.POST, instance=intake)
+        if form.is_valid():
+            water = form.save(commit=False)
+            
+            # Handle unit conversion if needed
+            amount = form.cleaned_data['amount']
+            unit = request.POST.get('unit', 'ml')
+            
+            if unit == 'oz':
+                # Convert from oz to ml for storage
+                water.amount = amount * OZ_TO_ML
+                
+            water.save()
+            messages.success(request, 'Water intake updated successfully!')
+            return redirect('water_list')
+    else:
+        # Get user's preferred unit
+        unit_preference = getattr(request.user.profile, 'water_unit_preference', 'ml')
+        
+        # Convert amount based on preference for display
+        if unit_preference == 'oz':
+            display_amount = intake.amount * ML_TO_OZ
+        else:
+            display_amount = intake.amount
+            
+        form = WaterIntakeForm(instance=intake, initial={
+            'amount': display_amount
+        })
+    
+    context = {
+        'form': form,
+        'intake': intake,
+        'unit': getattr(request.user.profile, 'water_unit_preference', 'ml')
+    }
+    
+    return render(request, 'tracker/water/water_form.html', context)
 
 @login_required
 def water_delete(request, pk):
@@ -467,6 +552,28 @@ def water_delete(request, pk):
     
     return render(request, 'tracker/water/water_confirm_delete.html', {'intake': intake})
 
+@login_required
+def update_water_preference(request):
+    """View to update user's water unit preference."""
+    if request.method == 'POST':
+        preference = request.POST.get('water_unit_preference')
+        
+        if preference in ['ml', 'oz']:
+            profile = request.user.profile
+            profile.water_unit_preference = preference
+            profile.save()
+            
+            messages.success(request, f'Water unit preference updated to {preference}!')
+            
+            # If AJAX request, return JSON response
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success'})
+        
+        # Redirect back to water list
+        return redirect('water_list')
+    
+    # If not POST, redirect to water list
+    return redirect('water_list')
 
 # Analytics and Reports
 @login_required
@@ -711,7 +818,7 @@ def get_ai_response(user, message):
         
         elif 'nutrition' in message_lower or 'diet' in message_lower or 'food' in message_lower:
             return "A balanced diet is essential for fitness. Focus on lean proteins, complex carbohydrates, healthy fats, and plenty of fruits and vegetables. Remember to adjust your caloric intake based on your fitness goals."
-        
+     
         elif 'motivation' in message_lower or 'tired' in message_lower or 'giving up' in message_lower:
             return "Remember why you started! Every workout gets you closer to your goals, even on tough days. Try mixing up your routine if you're feeling unmotivated."
         
@@ -805,5 +912,4 @@ def clear_chat(request):
     return redirect('chat')
 
 def profile_view(request):
-    return render(request, 'tracker/profile.html') 
-
+    return render(request, 'tracker/profile.html')
