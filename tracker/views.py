@@ -913,3 +913,4 @@ def clear_chat(request):
 
 def profile_view(request):
     return render(request, 'tracker/profile.html')
+
